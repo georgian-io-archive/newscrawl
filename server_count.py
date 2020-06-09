@@ -9,7 +9,6 @@ class ServerCountJob(CCSparkJob):
 
     name = "CountServers"
     fallback_server_name = '(no server in HTTP header)'
-
     def process_record(self, record):
         server_name = None
 
