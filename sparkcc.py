@@ -173,8 +173,8 @@ class CCSparkJob(object):
         input_data = sc.textFile(self.args.input,
                                  minPartitions=self.args.num_input_partitions)
 
-        output = input_data.mapPartitionsWithIndex(self.process_warcs) \
-            .reduceByKey(self.reduce_by_key_func)
+        output = input_data.mapPartitionsWithIndex(self.process_warcs) #\
+          #  .reduceByKey(self.reduce_by_key_func)
 
         sqlc.createDataFrame(output, schema=self.output_schema) \
             .coalesce(self.args.num_output_partitions) \
@@ -238,6 +238,7 @@ class CCSparkJob(object):
                 archive_iterator = ArchiveIterator(stream,
                                                    no_record_parse=no_parse)
                 for res in self.iterate_records(uri, archive_iterator):
+
                     yield res
             except ArchiveLoadFailed as exception:
                 self.warc_input_failed.add(1)
