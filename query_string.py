@@ -5,12 +5,12 @@ from collections import Counter
 from pyspark.sql.types import StructType, StructField, StringType, LongType, ArrayType
 
 from sparkcc import CCSparkJob
-
+from databricks_sparkcc import JupyterCCSparkJob
 from bs4 import BeautifulSoup
 import htmlmin
 
 
-class StringMatchCountJob(CCSparkJob):
+class StringMatchCountJob(JupyterCCSparkJob):
     """ Word count (frequency list) from texts in Common Crawl WET files"""
 
     name = "StringMatchCount"
@@ -42,16 +42,6 @@ class StringMatchCountJob(CCSparkJob):
 
     word_pattern = re.compile('\w+', re.UNICODE)
 
-    @staticmethod
-    def reduce_by_key_func(a, b):
-        # sum values of tuple <term_frequency, document_frequency>
-        return a
-
-    def add_arguments(self, parser):
-        parser.add_argument("--match_query", default=None,
-                            help="match title/body with some string")
-        parser.add_argument("--match_on", default=None,
-                            help="choose to match on title or body")
 
     def process_record(self, record):
         if record.rec_type == 'response':
@@ -94,9 +84,6 @@ class StringMatchCountJob(CCSparkJob):
                 elif t.name == 'img':
                     html_image.append(str(t))
 
-            #print("html_meta", html_meta)
-            #print("html_hyperlink", html_hyperlink)
-            #print("html_image", html_image)
             body = ""
             for paragraph in paragraphs:
                 if not paragraph.has_attr('class'):
@@ -112,7 +99,5 @@ class StringMatchCountJob(CCSparkJob):
         else:
             return
 
-
-if __name__ == '__main__':
-    job = StringMatchCountJob()
-    job.run()
+job = StringMatchCountJob()
+job.run()

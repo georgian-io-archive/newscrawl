@@ -38,49 +38,50 @@ columns = ['title','body','url','record_date', 'content_length',
 rows = []
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument("query", help="the key word you want to look at")
+parser.add_argument('--ner', dest='ner', action='store_true')
+parser.add_argument('--no-ner', dest='ner', action='store_false')
+parser.add_argument('--csv', dest='csv', action='store_true')
+parser.add_argument('--no-csv', dest='csv', action='store_false')
+parser.set_defaults(ner=True)
+parser.set_defaults(csv=False)
+args = parser.parse_args()
 
+
+
+
+
+def performNER(title, body):
+    doc = nlp(title)
+    for ent in doc.ents:
+        if ent.label_ == "ORG" and ent.text.lower() in args.query.lower():
+            print("org Found:", ent.text)
+            return True
+    return False
 
 class CompanyQuery():
 
     def __init__(self):
-        self.parser = argparse.ArgumentParser()
-        self.parser.add_argument("query", help="the key word you want to look at")
-        self.parser.add_argument('--ner', dest='ner', action='store_true')
-        self.parser.add_argument('--no-ner', dest='ner', action='store_false')
-        self.parser.add_argument('--csv', dest='csv', action='store_true')
-        self.parser.add_argument('--no-csv', dest='csv', action='store_false')
-        self.parser.set_defaults(ner=True)
-        self.parser.set_defaults(csv=False)
-        self.args = self.parser.parse_args()
-
-    def performNER(self,title,body):
-        doc = nlp(title)
-        for ent in doc.ents:
-            if ent.label_ == "ORG" and self.args.query.lower().contains(ent.text.lower()):
-                print("org Found:", ent.text)
-                return True
-        return False
-
+        pass
 
     def performQuery(self):
 
-        performNERudf = udf(self.performNER, BooleanType())
+        performNERudf = udf(performNER, BooleanType())
 
-        if self.args.ner:
+        if args.ner:
             for row in df.filter(performNERudf("title", "body")).collect():
                 print(row.title)
-                if self.args.csv:
+                if args.csv:
                     rows.append([i for i in row])
         else:
-            for row in df.filter(df.title.contains(self.args.query)).collect():
+            for row in df.filter(df.title.contains(args.query)).collect():
                 print(row.title)
-                if self.args.csv:
+                if args.csv:
                     rows.append([i for i in row])
 
     def saveData(self):
-        print(self.args.csv)
-        if self.args.csv:
-            print("OKO")
+        if args.csv:
             panda_df = pd.DataFrame(rows,columns=columns)
           #  print(panda_df)
             panda_df.to_csv('panda_dataframe.csv')
