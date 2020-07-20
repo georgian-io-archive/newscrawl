@@ -5,10 +5,10 @@ import re
 
 from io import BytesIO
 from tempfile import TemporaryFile
-
+from multiprocessing.pool import ThreadPool
 import boto3
 import botocore
-
+import time
 from warcio.archiveiterator import ArchiveIterator
 from warcio.recordloader import ArchiveLoadFailed
 
@@ -25,7 +25,6 @@ from pyspark.sql.types import StructType, StructField, StringType, LongType, Arr
 from bs4 import BeautifulSoup
 
 LOGGING_FORMAT = '%(asctime)s %(levelname)s %(name)s: %(message)s'
-
 
 class JupyterCCSparkJob(object):
     """
@@ -52,10 +51,10 @@ class JupyterCCSparkJob(object):
     log_level = 'INFO'
     logging.basicConfig(level=log_level, format=LOGGING_FORMAT)
 
-    num_input_partitions = 400
-    num_output_partitions = 1
-    input_path =  "./input/subset_news_warc.txt"       #"/FileStore/tables/subset_news_warc.txt"  # "/dbfs /FileStore/tables/subset_news_warc.txt"
-    output_path = "subsetnews"
+    num_input_partitions = 40
+    num_output_partitions = 10
+    input_path = "/Users/alexxue/Desktop/commoncrawltest/cc-pyspark/input/subset_news_warc.txt"
+    output_path = "delete_this"
 
     def parse_arguments(self):
         """ Returns the parsed arguments from the command line """
@@ -106,7 +105,7 @@ class JupyterCCSparkJob(object):
         if not self.validate_arguments(args):
             raise Exception("Arguments not valid")
         self.init_logging(args.log_level)
-        print(args.input)
+        # print(args.input)
         return args
 
     def add_arguments(self, parser):
@@ -183,9 +182,8 @@ class JupyterCCSparkJob(object):
 
         input_data = sc.textFile(self.args.input,
                                  minPartitions=self.args.num_input_partitions)
-        # print(input_data.collect())
+        print("going to output process warcs")
         output = input_data.mapPartitionsWithIndex(self.process_warcs)
-
         sqlc.createDataFrame(output, schema=self.output_schema) \
             .coalesce(self.args.num_output_partitions) \
             .write \
@@ -204,6 +202,8 @@ class JupyterCCSparkJob(object):
         no_sign_request = botocore.client.Config(
             signature_version=botocore.UNSIGNED)
         s3client = boto3.client('s3', config=no_sign_request)
+        start = time.time()
+        #  spark.time()
 
         for uri in iterator:
             self.warc_input_processed.add(1)
@@ -244,9 +244,15 @@ class JupyterCCSparkJob(object):
                     continue
 
             no_parse = (not self.warc_parse_http_header)
+            end = time.time()
+            print("ended with : ", end - start)
             try:
                 archive_iterator = ArchiveIterator(stream,
                                                    no_record_parse=no_parse)
+
+              #  pool = ThreadPool(5)
+              #  a = pool.map(lambda x: x, self.iterate_records(uri,archive_iterator) )
+              #  yield from a
                 for res in self.iterate_records(uri, archive_iterator):
                     yield res
             except ArchiveLoadFailed as exception:
@@ -263,16 +269,18 @@ class JupyterCCSparkJob(object):
         """Iterate over all WARC records. This method can be customized
            and allows to access also values from ArchiveIterator, namely
            WARC record offset and length."""
-        kek = 0
+        ok = 0
+
+
         for record in archive_iterator:
             for res in self.process_record(record):
-                kek += 1
-                print(kek)
-                if kek >= 10:
+                ok += 1
+                if ok >= 10:
                     break
                 yield res
-            if kek >= 10:
+            if ok >= 10:
                 break
+
             self.records_processed.add(1)
             # WARC record offset and length should be read after the record
             # has been processed, otherwise the record content is consumed
@@ -392,6 +400,6 @@ class StringMatchCountJob(JupyterCCSparkJob):
             return
 
 
-#dbutils.fs.rm('/user/hive/warehouse/asdfasdf', True)
+# dbutils.fs.rm('/user/hive/warehouse/subsetnews8', True)
 job = StringMatchCountJob()
 job.run()

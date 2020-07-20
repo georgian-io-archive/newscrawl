@@ -5,12 +5,12 @@ from collections import Counter
 from pyspark.sql.types import StructType, StructField, StringType, LongType, ArrayType
 
 from sparkcc import CCSparkJob
-from databricks_sparkcc import JupyterCCSparkJob
+#from databricks_sparkcc import JupyterCCSparkJob
 from bs4 import BeautifulSoup
 import htmlmin
 
 
-class StringMatchCountJob(JupyterCCSparkJob):
+class StringMatchCountJob(CCSparkJob):
     """ Word count (frequency list) from texts in Common Crawl WET files"""
 
     name = "StringMatchCount"

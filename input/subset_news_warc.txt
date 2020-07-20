@@ -1,1 +1,1 @@
-file:/Users/alexxue/Desktop/commoncrawltest/warc/CC-NEWS-20200608161927-00435.warc.gz
+s3://commoncrawl/crawl-data/CC-NEWS/2020/06/CC-NEWS-20200602030817-00345.warc.gz

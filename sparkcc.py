@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 import re
-
+import time
 from io import BytesIO
 from tempfile import TemporaryFile
 
@@ -193,6 +193,7 @@ class CCSparkJob(object):
         # S3 client (not thread-safe, initialize outside parallelized loop)
         no_sign_request = botocore.client.Config(
             signature_version=botocore.UNSIGNED)
+        start_time = time.time()
         s3client = boto3.client('s3', config=no_sign_request)
 
         for uri in iterator:
@@ -234,6 +235,8 @@ class CCSparkJob(object):
                     continue
 
             no_parse = (not self.warc_parse_http_header)
+            end_time = time.time()
+            print("it took: " , start_time - end_time)
             try:
                 archive_iterator = ArchiveIterator(stream,
                                                    no_record_parse=no_parse)
