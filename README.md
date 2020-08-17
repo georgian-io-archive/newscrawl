@@ -1,14 +1,14 @@
 Producing news articles in the form of dataframes, given a set of company names.
 
-##Setup
+## Setup
 
 Commands are already ordered so that they should be run chronologically. Load `sparkcc.ipynb` into databricks.
 
-##Compatability and requirements
+## Compatability and requirements
 
 Databricks natively has Spark installed. Ensure that the cluster has ability to read/write to S3 if you plan to use it.
 
-##Required data
+## Required data
 
 There are a few files that must be set up properly in order to run the notebook properly. Samples will be provided. Make sure to edit the respective variables in the notebook if you plan to use a different file/path.
 
