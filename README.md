@@ -1,5 +1,7 @@
 Producing news articles in the form of dataframes, given a set of company names.
-
+The goal of this project is to create a pipeline that can produce news articles from an arbitrary time period, for an arbitrary set of companies.
+The data will be sourced from News Crawl.
+ 
 # Setup
 
 Commands are already ordered so that they should be run chronologically. Load `sparkcc.ipynb` into databricks.
@@ -28,8 +30,13 @@ Calling `run` from `StringMatchCountJob` will produce a dataframe composed of al
 # Quickstart
 
 Loading the `sparkcc.ipynb` file into Databricks, as well as the neccessary files outlined above into DBFS is enough for it to run.
+The current `sparkcc.ipynb` is ready to run, so starting each command sequentially will get the data for the companies found in `all_labelled_data.csv` for the current month. 
 
 # Time and Space approximations
 
 * Processing of N different WARC Files (where N is less than or equal to the number of workers running on your databricks cluster) should take a 1 - 4 hours
 * Each company's specific dataframe size will vary based on how many times it appears in news articles. For a month's worth of data it should be at most 300 megabytes for the most popular companies
+
+# Next Step / Improvements
+
+Investigate how to optimize splitting the dataframe from `output_path` into different company specific dataframes
