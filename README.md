@@ -38,6 +38,8 @@ The current `sparkcc.ipynb` is ready to run, so starting each command sequential
 * Each company's specific dataframe size will vary based on how many times it appears in news articles. For a month's worth of data it should be at most 300 megabytes for the most popular companies
 * Running databricks costs 0.86 dollars per hour for 1 machine of the i3.xlarge CPU.
 
+Brief calculations: https://docs.google.com/document/d/1YR5ye1jIai9dHu7gzosU_iJqW5mNrgVtfXEwjGWAM0c/edit
+
 # Next Step / Improvements
 
 Investigate how to optimize splitting the dataframe from `output_path` into different company specific dataframes
