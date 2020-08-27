@@ -47,3 +47,5 @@ Investigate how to optimize splitting the dataframe from `output_path` into diff
 # Note on Databricks
 
 It is not neccessary to use Databricks for part one or part two of the data extraction process, however Spark is neccessary. More info on Databricks and Spark may be found: https://docs.google.com/document/d/1fCWwr-LnOuXHLsxdC4lwftraWVlGaNJj8Pg4xf58mNU/edit?ts=5efba57b#heading=h.s8sa0qj2g0yn
+
+Existing datasets: https://docs.google.com/spreadsheets/d/16Z-1yfYS6kjieMYnUcJ8hr7eiZDPGmirjunP-c6qgNk/edit#gid=0
